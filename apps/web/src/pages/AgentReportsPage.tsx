@@ -13,7 +13,7 @@ import { StatusActions } from '../components/StatusActions';
 import { StatusBadge } from '../components/StatusBadge';
 import { CATEGORY_ICON, formatDate } from '../lib/reports';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 const selectClass =
   'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600/30 focus:outline-none';
 
@@ -139,7 +139,7 @@ export function AgentReportsPage() {
           ))}
         </ol>
 
-        {data && pages > 1 && (
+        {data && data.total > 0 && (
           <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
             <button
               disabled={page <= 1}
