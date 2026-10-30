@@ -131,3 +131,23 @@ Redis logical DB and refuse to run against dev data.
 **Why / trade-offs:** Zoom 13 keeps a phone viewport to a handful of tiles (few keys per `MGET`)
 while each tile stays small enough to query cheaply. Fetching whole tiles returns a few extra rows
 that are trimmed in memory. The header makes cache behavior testable and demoable at no cost.
+
+## 013 – i18n with i18next and compile-time key checking; Tailwind (2026-10-29)
+
+**Context:** Pelotas is in Brazil near the Uruguay/Argentina border, and the reviewers read
+English: the UI must support at least Portuguese, English and Spanish.
+**Options:** react-intl (ICU messages), i18next, Lingui; JSON vs. TypeScript locale files.
+**Decision:** i18next + react-i18next with locales as TypeScript objects; `pt`/`es` are typed from
+`en`, and `t()` keys are type-checked. The API returns codes, not text. Styling with Tailwind v4.
+**Why / trade-offs:** i18next is the most common React choice, with browser language detection and
+plurals built in. TypeScript locales turn a forgotten translation into a build error instead of a
+raw key on screen, at the cost of editing `.ts` instead of JSON (harder for non-developer
+translators). Tailwind keeps styles next to markup and makes the responsive layout quick.
+
+## 014 – Agents don't upvote; status actions also on the map (2026-10-29)
+
+**Decision:** The upvote button is shown only to citizens. Agents see the count and get status
+actions both in the list and in the map's details panel.
+**Why / trade-offs:** Upvotes measure how many citizens a problem affects; agent upvotes would
+skew the priority signal. The rule is enforced in the UI only — the API still accepts upvotes
+from any logged-in user (a candidate for a server-side check).

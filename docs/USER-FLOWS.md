@@ -74,6 +74,9 @@ names; only counts are public.
 3. Can filter by status and category.
 4. Can sort by **most upvoted** (default) or by date.
 
+Agents don't upvote: upvotes are the citizens' priority signal, and agents act on it. From a
+report's details on the map, agents get the same status actions as in the list (A3/A4).
+
 ### A2 – Report a problem
 
 Same as C1. Agents also find problems during inspections.

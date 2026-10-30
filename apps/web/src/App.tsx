@@ -1,23 +1,36 @@
-import { useEffect, useState } from 'react';
-
-type Health = { db: string; cache: string };
+import { Navigate, Route, Routes } from 'react-router';
+import { Layout } from './components/Layout';
+import { RequireAuth } from './components/RequireAuth';
+import { AgentReportsPage } from './pages/AgentReportsPage';
+import { LoginPage } from './pages/LoginPage';
+import { MapPage } from './pages/MapPage';
+import { NewReportPage } from './pages/NewReportPage';
+import { SignUpPage } from './pages/SignUpPage';
 
 export function App() {
-  const [health, setHealth] = useState<Health | null>(null);
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then(setHealth)
-      .catch(() => setHealth({ db: 'unreachable', cache: 'unreachable' }));
-  }, []);
-
   return (
-    <main>
-      <h1>City Reporter</h1>
-      <p>
-        API health: {health ? `db ${health.db}, cache ${health.cache}` : 'checking…'}
-      </p>
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route
+        element={
+          <RequireAuth>
+            <Layout />
+          </RequireAuth>
+        }
+      >
+        <Route index element={<MapPage />} />
+        <Route path="report/new" element={<NewReportPage />} />
+        <Route
+          path="agent/reports"
+          element={
+            <RequireAuth role="agent">
+              <AgentReportsPage />
+            </RequireAuth>
+          }
+        />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

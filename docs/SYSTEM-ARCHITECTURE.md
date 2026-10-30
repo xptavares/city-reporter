@@ -189,13 +189,40 @@ Mobile-first responsive web app — citizens use it on their phones in the stree
 
 | Route | Who | Content |
 |-------|-----|---------|
-| `/login`, `/signup` | public | auth forms |
-| `/` | 🔒 | full-screen map with pins; tap a pin → details sheet with upvote button |
-| `/report/new` | 🔒 | category menu → "use my location" (browser Geolocation API) or pick on map → description |
-| `/agent/reports` | 🛡️ | table/list sorted by most upvoted, filters, status actions |
+| `/login`, `/signup` | public | auth forms (sign-up validated with the shared zod schema) |
+| `/` | 🔒 | full-screen map with pins; tap a pin → details sheet. Citizens upvote; agents get status actions. Deep link: `/?report=<id>&lat=…&lng=…` |
+| `/report/new` | 🔒 | category grid → "use my location" (browser Geolocation API) or tap/drag a pin on the map → optional description |
+| `/agent/reports` | 🛡️ | list sorted by most upvoted, filters (status, category), pagination, status actions, "view on map" |
 
-- **TanStack Query** handles fetching, caching on the client and refetching after mutations.
+```
+apps/web/src/
+├── api/         client.ts (typed fetch + JWT), hooks.ts (TanStack Query queries/mutations)
+├── auth/        AuthContext (user from /auth/me), token storage
+├── components/  Layout, MapBase, ReportPanel, StatusActions, StatusBadge, RequireAuth, LanguageSwitcher
+├── i18n/        i18next setup + locales/en.ts, pt.ts, es.ts
+├── lib/         category icons, status colors, Leaflet pin icons
+└── pages/       Map, NewReport, AgentReports, Login, SignUp
+```
+
+- **TanStack Query** handles fetching, client-side caching and refetching after mutations
+  (creating a report invalidates `map` and `reports`; an upvote updates the cached details).
 - **react-leaflet** with **OpenStreetMap** tiles — the same open map the department already uses.
+  Pins are `divIcon`s: category emoji inside a ring colored by status.
+- **Tailwind CSS v4**, with theme colors from the PIEX presentation (navy, tactile-paving yellow, teal).
+- **Auth:** the JWT is kept in `localStorage`; any 401 signs the user out. Login returns the user
+  to the page that required it, including deep links.
+
+### Internationalization (i18n)
+
+- **i18next + react-i18next**, languages: **Portuguese, English, Spanish**. The language is detected
+  from the browser (`pt-BR` → `pt`), can be switched in the header, and is remembered.
+- `en.ts` is the source of truth. `pt.ts` and `es.ts` are typed as `Translation` (derived from
+  `en`), so **a missing or extra key is a compile error**, and `t('…')` keys are type-checked.
+- Plurals use i18next suffixes (`_zero`, `_one`, `_other`); dates use `Intl.DateTimeFormat` in the
+  current language.
+- Only the UI is translated: report descriptions are user content and shown as written.
+- The API speaks in codes (`pothole`, `not_found`, `Validation failed`) and the client maps them to
+  translated text, so the API stays language-neutral.
 
 ## Main flows
 

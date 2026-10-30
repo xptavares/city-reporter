@@ -3,6 +3,7 @@ import type { ReportCategory, ReportStatus } from '@city-reporter/shared';
 import { sequelize } from './sequelize';
 import { Report, Upvote, User } from '../models';
 import { hashPassword } from '../services/auth-service';
+import { redis } from '../cache/redis';
 
 export const DEMO_PASSWORD = 'password123';
 
@@ -31,6 +32,7 @@ const REPORTS: Array<{
   { category: 'sidewalk_obstruction', description: 'Car parked on the sidewalk', lat: -31.7685, lng: -52.3362, status: 'not_found', upvotes: 0 },
 ];
 
+// citizen@cityreporter.local (index 0) starts with no upvotes, so the demo can show upvoting.
 const CITIZEN_COUNT = 10;
 
 await sequelize.transaction(async (transaction) => {
@@ -67,12 +69,18 @@ await sequelize.transaction(async (transaction) => {
       { transaction },
     );
     await Upvote.bulkCreate(
-      citizens.slice(0, r.upvotes).map((c) => ({ userId: c.id, reportId: report.id })),
+      citizens.slice(1, 1 + r.upvotes).map((c) => ({ userId: c.id, reportId: report.id })),
       { transaction },
     );
   }
 });
 
+// Every id changed: drop all cached entries (including /auth/me of the deleted users).
+for await (const found of redis.scanStream({ match: 'cr:*', count: 500 })) {
+  if (found.length) await redis.del(...(found as string[]));
+}
+
 console.log(`Seeded ${REPORTS.length} reports, 1 agent and ${CITIZEN_COUNT} citizens.`);
 console.log(`Logins (password "${DEMO_PASSWORD}"): agent@cityreporter.local, citizen@cityreporter.local`);
 await sequelize.close();
+redis.disconnect(); // open connections would keep the process alive

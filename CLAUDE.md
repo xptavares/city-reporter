@@ -54,7 +54,9 @@ Monorepo (npm workspaces), TypeScript everywhere. See `docs/SYSTEM-ARCHITECTURE.
   (migrations), bcryptjs + jsonwebtoken. Run with `tsx`. Layers: routes → controllers (zod
   parsing) → services (business rules) → models. Services throw `HttpError`; zod errors become 400.
   Serializers are explicit allow-lists — never expose `createdBy`/`statusChangedBy`/password hash.
-- `apps/web` — React 19, Vite.
+- `apps/web` — React 19, Vite, Tailwind v4, React Router, TanStack Query, react-leaflet (OSM),
+  i18next. **Every UI string goes through `t()`**: add the key to `i18n/locales/en.ts` first, then
+  `pt.ts` and `es.ts` (the compiler enforces matching keys).
 - `packages/shared` — enums/types/zod schemas, consumed as TypeScript source (no build step).
 
 ```bash

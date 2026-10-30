@@ -6,3 +6,6 @@ dist/
 .env
 *.log
 coverage/
+
+# Playwright MCP screenshots/snapshots
+.playwright-mcp/

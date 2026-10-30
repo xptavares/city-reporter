@@ -1,6 +1,12 @@
 # City Reporter
 
-_One-line description — to be written once the problem is defined (see [docs/PROBLEM.md](docs/PROBLEM.md))._
+Citizens of Pelotas (Brazil) report problems in public spaces — potholes, broken sidewalks,
+missing tactile paving — on a map, and upvote the ones that affect them. The Municipal Urban
+Planning Department gets an up-to-date, prioritized list of where to act. Built from field
+interviews with the department, whose main complaint was **the lack of up-to-date data**
+(see [docs/PROBLEM.md](docs/PROBLEM.md)).
+
+Responsive web app (works on phones), available in **Portuguese, English and Spanish**.
 
 ## Requirements
 
@@ -58,7 +64,7 @@ Cached endpoints (`/api/reports/map`, `/api/reports/:id`, `/api/reports`, `/api/
 
 ```
 apps/api         Express + Sequelize REST API
-apps/web         React + Vite web app
+apps/web         React + Vite + Tailwind + Leaflet web app (i18n: pt, en, es)
 packages/shared  enums, types and schemas shared by API and web
 ```
 

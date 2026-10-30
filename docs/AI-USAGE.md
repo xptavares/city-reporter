@@ -55,3 +55,15 @@ invalidation, fail-open) with tests.
 implementation, and a test that simulates Redis being down. Tests were moved to a separate Redis
 DB with a guard, after noticing `FLUSHDB` between tests would otherwise wipe the dev cache.
 **Lesson:** Ask for observable behavior (headers, counts) so caching can be verified, not assumed.
+
+### 2026-10-29 – Web app
+
+**Delegated:** The React app (map, report flow, agent list, auth) with i18n in pt/en/es, then
+verifying it in a real browser with the Playwright MCP (phone and desktop sizes, all languages).
+**Outcome:** Browser verification found bugs that type checks and API tests couldn't: login losing
+the `?report=` deep link (two redirects racing), Portuguese "0 apoio" (fixed with `_zero`
+plurals), the demo citizen having pre-existing upvotes, and the seed script hanging because the
+Redis connection kept Node alive. Playwright's synthetic click didn't reach Leaflet markers, so pin
+clicks were triggered via the DOM in testing.
+**Lesson:** For UI work, having the AI drive a real browser and look at screenshots is what
+catches integration bugs.
