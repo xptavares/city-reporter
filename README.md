@@ -22,6 +22,7 @@ _TBD_
 ## Project docs
 
 - [Problem](docs/PROBLEM.md)
+- [User flows](docs/USER-FLOWS.md)
 - [System architecture](docs/SYSTEM-ARCHITECTURE.md)
 - [Decisions](docs/DECISIONS.md)
 - [Write-up](docs/WRITEUP.md)

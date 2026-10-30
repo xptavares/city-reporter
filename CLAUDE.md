@@ -16,6 +16,7 @@ This repo is a submission for the Jeeves **Software Engineer – Phase 2 Vibe Co
 | File | Purpose |
 |------|---------|
 | `docs/PROBLEM.md` | The problem, who has it, why it matters, scope (in/out). Written by the author. |
+| `docs/USER-FLOWS.md` | Actors (citizen, agent), report statuses, and what each actor can do. Drives the data model and API. |
 | `docs/DECISIONS.md` | Decision log: each significant choice with options considered, trade-offs and rationale. |
 | `docs/SYSTEM-ARCHITECTURE.md` | Components, data model, flows, and how the pieces fit together. |
 | `docs/AI-USAGE.md` | Log of how AI tools were used: what was delegated, corrected or rejected. |
