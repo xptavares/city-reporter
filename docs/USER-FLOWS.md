@@ -35,6 +35,9 @@ and voting would let bots flood the system with fake reports and votes. Each acc
 
 1. User logs in with email and password; the app shows the features for their role.
 
+**Privacy:** users can never identify each other. Reports and upvotes are shown without author
+names; only counts are public.
+
 ## Citizen flows
 
 ### C1 – Report a new problem

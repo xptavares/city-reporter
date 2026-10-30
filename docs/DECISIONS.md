@@ -62,3 +62,48 @@ upvoted.
 **Why / trade-offs:** Upvotes turn citizen input into a simple priority ranking, which is the
 department's actual need. We lose citizen-driven validation of whether a problem still exists;
 that stays with agents (`fixed` / `not_found`, decision 003).
+
+## 006 – Monorepo with TypeScript on both sides (2026-10-29)
+
+**Options:** (A) separate repos; (B) monorepo with npm workspaces; JavaScript vs. TypeScript.
+**Decision:** B with TypeScript: `apps/api`, `apps/web`, `packages/shared`.
+**Why / trade-offs:** One repo is easier to run and review. A shared package lets API and web use
+the same enums, types and zod schemas, so they can't drift apart. TypeScript adds some setup but
+catches contract mistakes at compile time.
+
+## 007 – Responsive web app instead of a native mobile app (2026-10-29)
+
+**Options:** (A) native/React Native app; (B) mobile-first responsive web.
+**Decision:** B.
+**Why / trade-offs:** Fits a 3-day timeline, needs no app store, and still gives citizens GPS via
+the browser Geolocation API. We lose push notifications and offline use (see `NEXT-STEPS.md`).
+
+## 008 – PostgreSQL + PostGIS, Express + Sequelize (2026-10-29)
+
+**Options:** Postgres with plain lat/lng columns vs. PostGIS; Sequelize vs. Prisma.
+**Decision:** Postgres + PostGIS (`geography(Point)` with a GiST index), accessed via Sequelize.
+**Why / trade-offs:** The whole product is geographic; PostGIS makes "reports in this map area"
+an indexed query and opens the door to proximity queries (e.g. duplicate detection). Sequelize
+supports the `GEOMETRY`/`GEOGRAPHY` types natively, where Prisma's PostGIS support is limited.
+Cost: one more extension to set up, handled by the PostGIS Docker image.
+
+## 009 – Redis read cache, cache-aside with versioned keys (2026-10-29)
+
+**Context:** The map is the most-read screen and is hit by every citizen.
+**Decision:** Redis cache-aside in front of map pins, report details and the agent list.
+Invalidation by bumping a version counter per key group; map cached per slippy-map tile rather
+than per exact bounding box; upvote counts kept out of map pins so upvotes don't invalidate the
+map. Fail-open: if Redis is down, serve from Postgres.
+**Why / trade-offs:** Versioned keys avoid fragile key-by-key invalidation, at the cost of some
+dead keys living until their TTL. Short TTLs mean a little staleness is possible (≤ 60 s on the
+agent list). `/auth/me` is also cached per user (`cr:user:{id}`).
+
+## 010 – Users can never identify each other (2026-10-29)
+
+**Context:** Reporting problems near one's home can reveal where a person lives or moves;
+citizens should feel safe reporting.
+**Decision:** No API response exposes another user's identity: no author on reports, no list of
+who upvoted, only counts. Author and upvote rows stay in the database for integrity and abuse
+tracing but are never serialized.
+**Why / trade-offs:** Protects reporters' privacy and keeps the cache simple (no per-user data in
+shared keys). Agents can't contact a reporter for more details; acceptable for the MVP.

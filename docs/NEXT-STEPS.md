@@ -11,6 +11,8 @@ What was deliberately left out of the MVP and what I would do next, roughly in p
 
 ## Later
 
+- **Native mobile app or PWA:** installable app with push notifications (e.g. "your report was
+  fixed") and offline report drafts. The MVP is a responsive web app (decision 007).
 - **Citizen XP / gamification** (Waze-style): citizens earn XP for reports and for upvotes their
   reports receive, encouraging participation.
 - **Photo evidence:** citizens attach photos to reports; agents attach a photo when marking a
