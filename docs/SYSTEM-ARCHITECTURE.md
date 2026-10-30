@@ -110,8 +110,8 @@ All endpoints are JSON under `/api`. 🔒 = requires login, 🛡️ = agent only
 | GET | `/reports/map?bbox=minLng,minLat,maxLng,maxLat` | 🔒 | C2 – pins in the visible area |
 | GET | `/reports/:id` | 🔒 | C2 – report details (+ whether I upvoted it) |
 | POST | `/reports` | 🔒 | C1 / A2 – create report |
-| PUT | `/reports/:id/upvote` | 🔒 | C3 – upvote (idempotent) |
-| DELETE | `/reports/:id/upvote` | 🔒 | C3 – remove upvote |
+| PUT | `/reports/:id/upvote` | citizen | C3 – upvote (idempotent) |
+| DELETE | `/reports/:id/upvote` | citizen | C3 – remove upvote |
 | GET | `/reports?status=&category=&sort=upvotes\|recent&page=` | 🛡️ | A1 – agent list |
 | PATCH | `/reports/:id/status` | 🛡️ | A3 / A4 – set `fixed` or `not_found` |
 

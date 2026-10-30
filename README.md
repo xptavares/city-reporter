@@ -30,8 +30,8 @@ Open http://localhost:5180.
 
 | Role | Email | Password |
 |------|-------|----------|
-| Agent (Urban Planning Dept.) | `agent@cityreporter.local` | `password123` |
-| Citizen | `citizen@cityreporter.local` | `password123` |
+| Agent (Urban Planning Dept.) | `agent@cityreporter.local` | `123qwe` |
+| Citizen | `citizen@cityreporter.local` | `123qwe` |
 
 Default ports are non-standard on purpose, so the project doesn't clash with a local Postgres,
 Redis or other dev servers. Change them in `.env` if needed:

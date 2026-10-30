@@ -146,8 +146,9 @@ translators). Tailwind keeps styles next to markup and makes the responsive layo
 
 ## 014 – Agents don't upvote; status actions also on the map (2026-10-29)
 
-**Decision:** The upvote button is shown only to citizens. Agents see the count and get status
-actions both in the list and in the map's details panel.
+**Decision:** Only citizens can upvote: the API answers 403 to agents (`requireRole('citizen')`),
+and the UI shows the upvote button only to citizens. Agents see the count and get status actions
+both in the list and in the map's details panel.
 **Why / trade-offs:** Upvotes measure how many citizens a problem affects; agent upvotes would
-skew the priority signal. The rule is enforced in the UI only — the API still accepts upvotes
-from any logged-in user (a candidate for a server-side check).
+skew the priority signal. Enforcing it in the API (not just hiding a button) keeps the rule true
+for any client.

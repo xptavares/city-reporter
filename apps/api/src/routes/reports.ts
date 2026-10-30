@@ -10,8 +10,10 @@ reportsRouter.use(requireAuth);
 reportsRouter.get('/map', reports.map); // before /:id so "map" isn't read as an id
 reportsRouter.get('/:id', reports.details);
 reportsRouter.post('/', reports.create);
-reportsRouter.put('/:id/upvote', reports.upvote);
-reportsRouter.delete('/:id/upvote', reports.removeUpvote);
+
+// Citizens only: upvotes are the citizens' priority signal (decision 014)
+reportsRouter.put('/:id/upvote', requireRole('citizen'), reports.upvote);
+reportsRouter.delete('/:id/upvote', requireRole('citizen'), reports.removeUpvote);
 
 // Agents only
 reportsRouter.get('/', requireRole('agent'), reports.list);

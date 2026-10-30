@@ -123,6 +123,15 @@ describe('upvotes', () => {
     expect((await api().delete(url).set('Authorization', auth)).body.upvoteCount).toBe(0);
   });
 
+  it('forbids agents from upvoting', async () => {
+    const agent = await createUser('agent');
+    const report = await createReport(agent.auth);
+    const url = `/api/reports/${report.id}/upvote`;
+
+    expect((await api().put(url).set('Authorization', agent.auth)).status).toBe(403);
+    expect((await api().delete(url).set('Authorization', agent.auth)).status).toBe(403);
+  });
+
   it('keeps the count right under concurrent upvotes', async () => {
     const author = await createUser();
     const report = await createReport(author.auth);

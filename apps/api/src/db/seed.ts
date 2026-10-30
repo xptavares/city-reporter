@@ -5,7 +5,8 @@ import { Report, Upvote, User } from '../models';
 import { hashPassword } from '../services/auth-service';
 import { redis } from '../cache/redis';
 
-export const DEMO_PASSWORD = 'password123';
+// Seeded directly (not through the sign-up schema), so it can be shorter than the 8-char minimum.
+export const DEMO_PASSWORD = '123qwe';
 
 // Approximate locations around Pelotas, RS.
 const REPORTS: Array<{
