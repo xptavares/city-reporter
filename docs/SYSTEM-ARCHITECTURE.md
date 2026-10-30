@@ -136,6 +136,12 @@ affects, each group of keys includes a version number. A write does `INCR` on th
 old keys become unreachable instantly and expire on their own via TTL. Simple and hard to get
 wrong.
 
+Code: `apps/api/src/cache/` — `keys.ts` (every key and TTL), `cache.ts` (fail-open helpers),
+`tiles.ts` (tile math).
+
+**Observability:** cached endpoints return an **`X-Cache: HIT | MISS | BYPASS`** header
+(`BYPASS` = Redis unavailable or skipped).
+
 ### Keys
 
 | Key | Value | TTL | Invalidated when |
@@ -148,12 +154,18 @@ wrong.
 Design notes:
 - **Map tiles instead of raw bounding boxes.** Every user's viewport is slightly different, so
   caching by exact `bbox` would almost never hit. The API snaps the requested bbox to fixed
-  **slippy-map tiles** at one zoom level, loads each tile from cache (or DB), and merges them.
-  Users looking at the same neighborhood share the same cache entries.
+  **slippy-map tiles** at **zoom 13** (~3.5 km wide in Pelotas), loads them with one `MGET`,
+  queries only the missing ones, then merges, de-duplicates and trims the pins to the bbox.
+  Users looking at the same neighborhood share the same cache entries. If a bbox needs more than
+  **64 tiles** (zoomed far out), the cache is skipped and the bbox is queried directly.
 - **Upvotes don't touch the map cache.** Pins don't carry upvote counts, so the most frequent write
   (upvotes) only invalidates the report details and the agent list — not the map.
 - **Per-user data is never in shared keys.** "Did I upvote this?" is read from Postgres (a primary
   key lookup) and merged into the cached details.
+- **Why versioned keys are race-safe:** a reader gets the version *before* querying Postgres, so
+  if a write bumps the version meanwhile, the reader's stale result lands under the old version
+  and is never read again. `cr:report:{id}` uses plain `DEL`, where a stale write is bounded by
+  its TTL.
 - **Short TTL on the agent list.** It changes with every upvote; 60 s plus version bumps keeps it
   fresh while still absorbing repeated reloads and pagination.
 

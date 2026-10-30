@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import { loginSchema, registerSchema } from '@city-reporter/shared';
 import * as authService from '../services/auth-service';
 import { currentUser } from '../middleware/auth';
+import { sendCached } from './send-cached';
 
 export const register: RequestHandler = async (req, res) => {
   const input = registerSchema.parse(req.body);
@@ -14,5 +15,5 @@ export const login: RequestHandler = async (req, res) => {
 };
 
 export const me: RequestHandler = async (req, res) => {
-  res.json(await authService.getMe(currentUser(req).id));
+  sendCached(res, await authService.getMe(currentUser(req).id));
 };

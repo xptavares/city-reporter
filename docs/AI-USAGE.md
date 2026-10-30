@@ -46,3 +46,12 @@ runner, breaking migration discovery). The privacy rule (decision 010) is enforc
 concurrency test for the upvote count.
 **Lesson:** Turning product rules ("users can't identify each other") into tests keeps the AI
 from silently regressing them later.
+
+### 2026-10-29 – Redis cache
+
+**Delegated:** Implement the cache design from the architecture doc (tile keys, versioned
+invalidation, fail-open) with tests.
+**Outcome:** Added an `X-Cache` header so tests assert HIT/MISS/BYPASS instead of trusting the
+implementation, and a test that simulates Redis being down. Tests were moved to a separate Redis
+DB with a guard, after noticing `FLUSHDB` between tests would otherwise wipe the dev cache.
+**Lesson:** Ask for observable behavior (headers, counts) so caching can be verified, not assumed.

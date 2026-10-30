@@ -8,6 +8,7 @@ const { redis } = await import('../src/cache/redis');
 
 beforeEach(async () => {
   await sequelize.query('TRUNCATE upvotes, reports, users CASCADE');
+  await redis.flushdb();
 });
 
 afterAll(async () => {

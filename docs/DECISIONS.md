@@ -121,3 +121,13 @@ that locks the report row, inserts the upvote (idempotent) and only then updates
 negligible cost at city scale — and a test proves 10 concurrent upvotes yield exactly 10.
 `bcryptjs` (pure JS) was chosen over native `bcrypt` to avoid native builds; it's slower, which
 doesn't matter for login volumes.
+
+## 012 – Cache implementation details: zoom-13 tiles, X-Cache header (2026-10-29)
+
+**Context:** Implementing decision 009 needed concrete numbers and a way to see the cache work.
+**Decision:** Map tiles at zoom 13 (~3.5 km in Pelotas), max 64 tiles per request before
+bypassing the cache. Cached endpoints return `X-Cache: HIT | MISS | BYPASS`. Tests use a separate
+Redis logical DB and refuse to run against dev data.
+**Why / trade-offs:** Zoom 13 keeps a phone viewport to a handful of tiles (few keys per `MGET`)
+while each tile stays small enough to query cheaply. Fetching whole tiles returns a few extra rows
+that are trimmed in memory. The header makes cache behavior testable and demoable at no cost.

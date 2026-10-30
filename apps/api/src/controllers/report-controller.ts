@@ -8,6 +8,7 @@ import {
 } from '@city-reporter/shared';
 import * as reportService from '../services/report-service';
 import { currentUser } from '../middleware/auth';
+import { sendCached } from './send-cached';
 
 const idParamsSchema = z.object({ id: z.uuid() });
 const reportId = (req: Request) => idParamsSchema.parse(req.params).id;
@@ -19,16 +20,16 @@ export const create: RequestHandler = async (req, res) => {
 
 export const map: RequestHandler = async (req, res) => {
   const query = mapQuerySchema.parse(req.query);
-  res.json(await reportService.getMapPins(query));
+  sendCached(res, await reportService.getMapPins(query));
 };
 
 export const details: RequestHandler = async (req, res) => {
-  res.json(await reportService.getReportDetails(reportId(req), currentUser(req).id));
+  sendCached(res, await reportService.getReportDetails(reportId(req), currentUser(req).id));
 };
 
 export const list: RequestHandler = async (req, res) => {
   const query = listReportsQuerySchema.parse(req.query);
-  res.json(await reportService.listReports(query));
+  sendCached(res, await reportService.listReports(query));
 };
 
 export const updateStatus: RequestHandler = async (req, res) => {

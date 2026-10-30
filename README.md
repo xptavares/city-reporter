@@ -45,6 +45,15 @@ npm test           # migrations are applied to the test DB automatically
 npm run typecheck
 ```
 
+Tests use their own Postgres database (`TEST_DATABASE_URL`) and Redis logical DB
+(`TEST_REDIS_URL`, db 1), and refuse to run if those point at the dev ones.
+
+### Seeing the cache work
+
+Cached endpoints (`/api/reports/map`, `/api/reports/:id`, `/api/reports`, `/api/auth/me`) return an
+`X-Cache: HIT | MISS | BYPASS` header. Request the same one twice: `MISS`, then `HIT`. Stop Redis
+(`docker compose stop redis`) and the API keeps answering with `BYPASS`.
+
 ## Repository layout
 
 ```

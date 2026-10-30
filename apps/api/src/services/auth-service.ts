@@ -4,6 +4,8 @@ import type { AuthResponse, LoginInput, RegisterInput, User as UserDto } from '@
 import { User } from '../models';
 import { HttpError } from '../http-error';
 import { signToken } from '../middleware/auth';
+import { cached, type Cached } from '../cache/cache';
+import { TTL, keys } from '../cache/keys';
 
 const BCRYPT_ROUNDS = 10;
 
@@ -42,10 +44,13 @@ export async function login(input: LoginInput): Promise<AuthResponse> {
   return authResponse(user);
 }
 
-export async function getMe(userId: string): Promise<UserDto> {
-  const user = await User.findByPk(userId);
-  if (!user) throw new HttpError(401, 'User no longer exists');
-  return toUserDto(user);
+export async function getMe(userId: string): Promise<Cached<UserDto>> {
+  // Users can't edit their profile or role yet; when they can, invalidate keys.user(id) there.
+  return cached(keys.user(userId), TTL.user, async () => {
+    const user = await User.findByPk(userId);
+    if (!user) throw new HttpError(401, 'User no longer exists');
+    return toUserDto(user);
+  });
 }
 
 export async function hashPassword(password: string): Promise<string> {
