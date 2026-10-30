@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -33,6 +33,11 @@ export function AgentReportsPage() {
     pageSize: PAGE_SIZE,
   });
   const pages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
+
+  // Resolving the last items of the last page shrinks the list: go back to the last page that exists.
+  useEffect(() => {
+    if (data && page > pages) setPage(pages);
+  }, [data, page, pages]);
 
   // Changing a filter goes back to the first page.
   const filter =
