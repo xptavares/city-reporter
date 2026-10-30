@@ -36,3 +36,13 @@ before connecting (`enableOfflineQueue: false`), fixed with a command timeout. D
 clashed with services already on my machine, so all ports moved to `.env`.
 **Lesson:** Verify end to end (proxy → API → DB/Redis, and Redis stopped) rather than trusting a
 green typecheck.
+
+### 2026-10-29 – REST API
+
+**Delegated:** Migrations, models, auth (JWT), reports, upvotes, agent endpoints, demo seed and a
+22-test suite against a real Postgres + PostGIS.
+**Outcome:** Tests caught a Vitest-specific issue (`import.meta.dirname` undefined in its module
+runner, breaking migration discovery). The privacy rule (decision 010) is enforced by a test that asserts no response contains the author's or agent's id, plus a
+concurrency test for the upvote count.
+**Lesson:** Turning product rules ("users can't identify each other") into tests keeps the AI
+from silently regressing them later.

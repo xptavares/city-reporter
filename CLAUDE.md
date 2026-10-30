@@ -50,12 +50,17 @@ without asking.
 
 Monorepo (npm workspaces), TypeScript everywhere. See `docs/SYSTEM-ARCHITECTURE.md`.
 
-- `apps/api` — Express 5, Sequelize 6, Postgres 16 + PostGIS, Redis (ioredis), zod. Run with `tsx`.
+- `apps/api` — Express 5, Sequelize 6, Postgres 16 + PostGIS, Redis (ioredis), zod, Umzug
+  (migrations), bcryptjs + jsonwebtoken. Run with `tsx`. Layers: routes → controllers (zod
+  parsing) → services (business rules) → models. Services throw `HttpError`; zod errors become 400.
+  Serializers are explicit allow-lists — never expose `createdBy`/`statusChangedBy`/password hash.
 - `apps/web` — React 19, Vite.
 - `packages/shared` — enums/types/zod schemas, consumed as TypeScript source (no build step).
 
 ```bash
 npm run infra:up     # start Postgres (5433) + Redis (6380) in Docker
+npm run db:migrate   # Umzug migrations in apps/api/src/db/migrations
+npm run db:seed      # wipes + inserts demo data
 npm run dev          # API :4000 + web :5180
 npm test             # API tests (Vitest + Supertest) against city_reporter_test DB
 npm run typecheck    # all workspaces

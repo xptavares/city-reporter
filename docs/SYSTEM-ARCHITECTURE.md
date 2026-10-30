@@ -41,7 +41,7 @@ city-reporter/
 │   │       ├── services/    business rules (statuses, upvotes, cache invalidation)
 │   │       ├── models/      Sequelize models
 │   │       ├── cache/       Redis client + key builders
-│   │       ├── db/          migrations + seeders
+│   │       ├── db/          Umzug migrations, migrate CLI, demo seed
 │   │       └── middleware/  auth (JWT), error handler
 │   └── web/                 React SPA
 │       └── src/
@@ -62,7 +62,7 @@ input and the web app uses the same schemas for its forms, so both sides can't d
 | Layer | Choice |
 |-------|--------|
 | Language | TypeScript (Node.js LTS) |
-| API | Express, Sequelize, zod, bcrypt, jsonwebtoken |
+| API | Express 5, Sequelize 6, zod, bcryptjs, jsonwebtoken, Umzug (migrations) |
 | Database | PostgreSQL 16 + PostGIS |
 | Cache | Redis 7 |
 | Web | React, Vite, React Router, TanStack Query, react-leaflet + OpenStreetMap tiles |
@@ -119,7 +119,12 @@ Notes:
 - **Map vs. details are split on purpose.** `/reports/map` returns lightweight pins (id,
   category, status, lat/lng) — no upvote counts. Details come from `/reports/:id`. This keeps the
   map payload small and lets upvotes change without invalidating the map cache (see below).
-- Agent accounts are created by a **seeder** (no public sign-up for agents).
+- Agent accounts are created by a **seeder** (no public sign-up for agents). `/auth/register`
+  always creates a `citizen`, whatever the payload says.
+- **Upvotes are idempotent:** `PUT` twice keeps one upvote; `DELETE` without an upvote is a no-op.
+  Both return `{ upvoteCount, upvotedByMe }`. Upvoting is allowed on any status.
+- **Status changes:** agents can set any status, including back to `open` (e.g. to undo a mistake).
+- **Errors:** `{ error }`, plus `issues: [{ path, message }]` on validation failures (400).
 
 ## Caching (Redis)
 
@@ -188,8 +193,9 @@ again → insert into Postgres → `INCR cr:map:ver`, `INCR cr:list:ver` → 201
 **Open map (C2):** web sends visible bbox → API snaps to tiles → for each tile, Redis hit or
 PostGIS query (`location && ST_MakeEnvelope(...)`) and cache → merged pins returned.
 
-**Upvote (C3):** `PUT /reports/:id/upvote` → transaction: insert into `upvotes` (no-op if it
-already exists) + `upvote_count = upvote_count + 1` → `DEL cr:report:{id}`, `INCR cr:list:ver`.
+**Upvote (C3):** `PUT /reports/:id/upvote` → transaction: lock the report row
+(`SELECT … FOR UPDATE`), insert into `upvotes` (no-op if it already exists), and only if inserted
+`upvote_count + 1`. The lock serializes concurrent upvotes so the count never drifts → `DEL cr:report:{id}`, `INCR cr:list:ver`.
 
 **Change status (A3/A4):** agent `PATCH /reports/:id/status` → update status,
 `status_changed_by/at` → `DEL cr:report:{id}`, `INCR cr:map:ver`, `INCR cr:list:ver`.

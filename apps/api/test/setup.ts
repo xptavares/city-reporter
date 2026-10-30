@@ -1,7 +1,16 @@
-import { existsSync } from 'node:fs';
+import { afterAll, beforeEach } from 'vitest';
+import { useTestEnv } from './env';
 
-const envFile = new URL('../../../.env', import.meta.url);
-if (existsSync(envFile)) process.loadEnvFile(envFile);
+useTestEnv();
 
-// Never run tests against the dev database.
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
+const { sequelize } = await import('../src/db/sequelize');
+const { redis } = await import('../src/cache/redis');
+
+beforeEach(async () => {
+  await sequelize.query('TRUNCATE upvotes, reports, users CASCADE');
+});
+
+afterAll(async () => {
+  await sequelize.close();
+  redis.disconnect();
+});

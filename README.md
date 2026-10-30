@@ -13,10 +13,19 @@ _One-line description — to be written once the problem is defined (see [docs/P
 cp .env.example .env     # ports and connection strings
 npm install
 npm run infra:up         # Postgres + PostGIS and Redis in Docker
+npm run db:migrate       # create tables
+npm run db:seed          # demo data in Pelotas (wipes existing data!)
 npm run dev              # API on :4000 and web on :5180
 ```
 
 Open http://localhost:5180.
+
+### Demo accounts (from the seed)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Agent (Urban Planning Dept.) | `agent@cityreporter.local` | `password123` |
+| Citizen | `citizen@cityreporter.local` | `password123` |
 
 Default ports are non-standard on purpose, so the project doesn't clash with a local Postgres,
 Redis or other dev servers. Change them in `.env` if needed:
@@ -32,7 +41,7 @@ Redis or other dev servers. Change them in `.env` if needed:
 
 ```bash
 npm run infra:up   # tests run against a separate `city_reporter_test` database
-npm test
+npm test           # migrations are applied to the test DB automatically
 npm run typecheck
 ```
 

@@ -107,3 +107,17 @@ who upvoted, only counts. Author and upvote rows stay in the database for integr
 tracing but are never serialized.
 **Why / trade-offs:** Protects reporters' privacy and keeps the cache simple (no per-user data in
 shared keys). Agents can't contact a reporter for more details; acceptable for the MVP.
+
+## 011 – Migrations with Umzug; upvote count kept consistent with a row lock (2026-10-29)
+
+**Context:** We need versioned schema changes in TypeScript, and a denormalized `upvote_count`
+that never drifts from the `upvotes` table.
+**Options (migrations):** `sequelize.sync()`; `sequelize-cli`; Umzug (the library behind
+sequelize-cli). **Options (count):** `COUNT(*)` on read; atomic `UPDATE … + 1`; row lock.
+**Decision:** Umzug migrations written in TypeScript and run with `tsx` — `sync()` is not safe for
+real schema evolution and `sequelize-cli` has poor TS/ESM support. Upvotes run in a transaction
+that locks the report row, inserts the upvote (idempotent) and only then updates the count.
+**Why / trade-offs:** The lock makes concurrent upvotes on the same report wait for each other — a
+negligible cost at city scale — and a test proves 10 concurrent upvotes yield exactly 10.
+`bcryptjs` (pure JS) was chosen over native `bcrypt` to avoid native builds; it's slower, which
+doesn't matter for login volumes.

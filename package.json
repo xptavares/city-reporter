@@ -13,7 +13,9 @@
     "dev:web": "npm run dev -w @city-reporter/web",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:migrate": "npm run db:migrate -w @city-reporter/api",
+    "db:seed": "npm run db:seed -w @city-reporter/api"
   },
   "devDependencies": {
     "prettier": "^3.9.10"
