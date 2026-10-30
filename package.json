@@ -1,0 +1,21 @@
+{
+  "name": "city-reporter",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev -w @city-reporter/api",
+    "dev:web": "npm run dev -w @city-reporter/web",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
+  }
+}

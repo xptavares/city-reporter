@@ -48,4 +48,18 @@ without asking.
 
 ## Stack & commands
 
-_To be defined (see `docs/DECISIONS.md`). Fill in once chosen: how to install, run, test, lint._
+Monorepo (npm workspaces), TypeScript everywhere. See `docs/SYSTEM-ARCHITECTURE.md`.
+
+- `apps/api` — Express 5, Sequelize 6, Postgres 16 + PostGIS, Redis (ioredis), zod. Run with `tsx`.
+- `apps/web` — React 19, Vite.
+- `packages/shared` — enums/types/zod schemas, consumed as TypeScript source (no build step).
+
+```bash
+npm run infra:up     # start Postgres (5433) + Redis (6380) in Docker
+npm run dev          # API :4000 + web :5180
+npm test             # API tests (Vitest + Supertest) against city_reporter_test DB
+npm run typecheck    # all workspaces
+```
+
+Ports are non-default because the author's machine already runs other services on 5432, 6379,
+3000, 5173 and 5174. Never kill processes you didn't start; stop only by PID.

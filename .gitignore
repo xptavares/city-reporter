@@ -1,2 +1,8 @@
 # Challenge instructions (private, not for the public repo)
 docs/*.pdf
+
+node_modules/
+dist/
+.env
+*.log
+coverage/
