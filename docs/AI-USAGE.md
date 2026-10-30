@@ -67,3 +67,12 @@ Redis connection kept Node alive. Playwright's synthetic click didn't reach Leaf
 clicks were triggered via the DOM in testing.
 **Lesson:** For UI work, having the AI drive a real browser and look at screenshots is what
 catches integration bugs.
+
+### 2026-10-30 – Manual testing and submission docs
+
+**Delegated:** Fixes from my manual testing, then drafting `VIDEO-SCRIPT.md` and `WRITEUP.md`.
+**Outcome:** My manual testing found what the AI's checks missed: pagination was invisible with
+the seed data (page size 20 > 13 reports), and resolving the last items of the last page left an
+empty page. I also asked to block agent upvotes in the API, not only in the UI. The AI pointed out
+that changing the demo password to `123qwe` would not stop Chrome's leaked-password warning.
+**Lesson:** AI verification is not a substitute for using the product yourself.
